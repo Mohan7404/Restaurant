@@ -1,0 +1,15 @@
+trigger:
+- main
+
+pool:
+  vmImage: windows-latest
+
+steps:
+- task: WindowsMachineFileCopy@2
+  inputs:
+    SourcePath: '$(Build.SourcesDirectory)'
+    Contents: '**/*.html'
+    MachineNames: '20.6.132.179'
+    AdminUserName: 'mohan'
+    AdminPassword: 'Venkatesh@7404'
+    TargetPath: 'C:\inetpub\wwwroot'
