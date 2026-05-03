@@ -4,12 +4,53 @@ trigger:
 pool:
   vmImage: windows-latest
 
-steps:
-- task: WindowsMachineFileCopy@2
-  inputs:
-    SourcePath: '$(Build.SourcesDirectory)'
-    Contents: '**/*.html'
-    MachineNames: '20.6.132.179'
-    AdminUserName: 'mohan'
-    AdminPassword: 'Venkatesh@7404'
-    TargetPath: 'C:\inetpub\wwwroot'
+stages:
+
+# ===================== QA =====================
+- stage: QA
+  displayName: Deploy to QA
+  jobs:
+  - job: DeployQA
+    steps:
+    - task: WindowsMachineFileCopy@2
+      inputs:
+        SourcePath: '$(Build.SourcesDirectory)'
+        Contents: '**/*.html'
+        MachineNames: '20.6.132.179'
+        AdminUserName: 'mohan'
+        AdminPassword: 'Venkatesh@7404'
+        TargetPath: 'C:\inetpub\wwwroot\qa'
+
+# ===================== UAT =====================
+- stage: UAT
+  displayName: Deploy to UAT
+  dependsOn: QA
+  condition: succeeded()
+  jobs:
+  - job: DeployUAT
+    steps:
+    - task: WindowsMachineFileCopy@2
+      inputs:
+        SourcePath: '$(Build.SourcesDirectory)'
+        Contents: '**/*.html'
+        MachineNames: '20.6.132.180'
+        AdminUserName: 'mohan'
+        AdminPassword: 'Venkatesh@7404'
+        TargetPath: 'C:\inetpub\wwwroot\uat'
+
+# ===================== PROD =====================
+- stage: PROD
+  displayName: Deploy to Production
+  dependsOn: UAT
+  condition: succeeded()
+  jobs:
+  - job: DeployPROD
+    steps:
+    - task: WindowsMachineFileCopy@2
+      inputs:
+        SourcePath: '$(Build.SourcesDirectory)'
+        Contents: '**/*.html'
+        MachineNames: '20.6.132.181'
+        AdminUserName: 'mohan'
+        AdminPassword: 'Venkatesh@7404'
+        TargetPath: 'C:\inetpub\wwwroot'
